@@ -17,10 +17,18 @@ type App struct {
 	DB     *sql.DB
 }
 
+var createTableQuery string = "CREATE TABLE IF NOT EXISTS products( id SERIAL, name TEXT NOT NULL, price NUMERIC(10,2) NOT NULL DEFAULT 0.00, CONSTRAINT products_pkey PRIMARY KEY (id));"
+
 func (a *App) Initialize(user, password, dbname string) {
+	fmt.Println("Initializing!")
 	connString := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable", user, password, dbname)
 	var err error
 	a.DB, err = sql.Open("postgres", connString)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	_, err = a.DB.Exec(createTableQuery)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -29,7 +37,11 @@ func (a *App) Initialize(user, password, dbname string) {
 	a.initRoutes()
 }
 
-func (a *App) Run(addr string) {}
+func (a *App) Run(addr string) {
+	port := ":8010"
+	fmt.Printf("Listening on %s", port)
+	log.Fatal(http.ListenAndServe(port, a.Router))
+}
 
 func (a *App) getProduct(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
