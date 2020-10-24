@@ -19,9 +19,9 @@ type App struct {
 
 var createTableQuery string = "CREATE TABLE IF NOT EXISTS products( id SERIAL, name TEXT NOT NULL, price NUMERIC(10,2) NOT NULL DEFAULT 0.00, CONSTRAINT products_pkey PRIMARY KEY (id));"
 
-func (a *App) Initialize(user, password, dbname string) {
+func (a *App) Initialize(user, password, dbname, host, port, sslmode string) {
 	fmt.Println("Initializing!")
-	connString := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable", user, password, dbname)
+	connString := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%s sslmode=%s", user, password, dbname, host, port, sslmode)
 	var err error
 	a.DB, err = sql.Open("postgres", connString)
 	if err != nil {
