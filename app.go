@@ -10,6 +10,7 @@ import (
 
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
+	"github.com/rs/cors"
 )
 
 type App struct {
@@ -38,9 +39,14 @@ func (a *App) Initialize(user, password, dbname, host, port, sslmode string) {
 }
 
 func (a *App) Run(addr string) {
+	c := cors.New(cors.Options{
+		AllowedOrigins:   []string{"http://localhost:3000"},
+		AllowCredentials: true,
+	})
+	handler := c.Handler(a.Router)
 	port := ":8010"
 	fmt.Printf("Listening on %s", port)
-	log.Fatal(http.ListenAndServe(port, a.Router))
+	log.Fatal(http.ListenAndServe(port, handler))
 }
 
 func (a *App) getProduct(w http.ResponseWriter, r *http.Request) {
