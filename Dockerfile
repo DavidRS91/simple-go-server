@@ -4,12 +4,12 @@ FROM golang:latest
 WORKDIR /app
 
 # Add env vars
-ENV APP_DB_USERNAME=postgres
-ENV APP_DB_NAME=postgres
-ENV APP_DB_PASSWORD=mysecretpassword
-ENV APP_DB_HOST=host.docker.internal
-ENV APP_DB_PORT=5432
-ENV APP_DB_SSLMODE=disable 
+# ENV APP_DB_USERNAME=postgres
+# ENV APP_DB_NAME=postgres
+# ENV APP_DB_PASSWORD=mysecretpassword
+# ENV APP_DB_HOST=host.docker.internal
+# ENV APP_DB_PORT=5432
+# ENV APP_DB_SSLMODE=disable 
 
 # Add relevant files to image
 COPY go.mod go.sum ./

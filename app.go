@@ -21,14 +21,16 @@ type App struct {
 var createTableQuery string = "CREATE TABLE IF NOT EXISTS products( id SERIAL, name TEXT NOT NULL, price NUMERIC(10,2) NOT NULL DEFAULT 0.00, CONSTRAINT products_pkey PRIMARY KEY (id));"
 
 func (a *App) Initialize(user, password, dbname, host, port, sslmode string) {
-	fmt.Println("Initializing!")
+	fmt.Println("Initializing...")
 	connString := fmt.Sprintf("user=%s password=%s dbname=%s host=%s port=%s sslmode=%s", user, password, dbname, host, port, sslmode)
 	var err error
+	fmt.Println("Connecting to db...")
 	a.DB, err = sql.Open("postgres", connString)
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	fmt.Println("Running migrations...")
 	_, err = a.DB.Exec(createTableQuery)
 	if err != nil {
 		log.Fatal(err)
@@ -40,13 +42,12 @@ func (a *App) Initialize(user, password, dbname, host, port, sslmode string) {
 
 func (a *App) Run(addr string) {
 	c := cors.New(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:3000"},
+		AllowedOrigins:   []string{"*"},
 		AllowCredentials: true,
 	})
+	fmt.Printf("Listening on %s", addr)
 	handler := c.Handler(a.Router)
-	port := ":8010"
-	fmt.Printf("Listening on %s", port)
-	log.Fatal(http.ListenAndServe(port, handler))
+	log.Fatal(http.ListenAndServe(addr, handler))
 }
 
 func (a *App) getProduct(w http.ResponseWriter, r *http.Request) {
