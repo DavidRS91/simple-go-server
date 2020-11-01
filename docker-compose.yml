@@ -13,7 +13,7 @@ services:
       - APP_DB_USERNAME=postgres
       - APP_DB_NAME=postgres
       - APP_DB_PASSWORD=mysecretpassword
-      - APP_DB_HOST=host.docker.internal
+      - APP_DB_HOST=simple-go-server-db
       - APP_DB_PORT=5432
       - APP_DB_SSLMODE=disable 
   simple-go-server-db:
