@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/davidrs91/simple-go-server/data"
+	"github.com/DavidRS91/simple-go-server/data"
 	"github.com/gorilla/mux"
 )
 
@@ -18,7 +18,7 @@ func (s *Server) GetProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	p := data.Product{ID: id}
-	if err := p.getProduct(s.DB); err != nil {
+	if err := p.GetProduct(s.DB); err != nil {
 		switch err {
 		case sql.ErrNoRows:
 			respondWithError(w, http.StatusNotFound, "Product not found")
@@ -58,7 +58,7 @@ func (s *Server) CreateProduct(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 
-	if err := p.createProduct(s.DB); err != nil {
+	if err := p.CreateProduct(s.DB); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -82,7 +82,7 @@ func (s *Server) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	p.ID = id
 
-	if err := p.updateProduct(s.DB); err != nil {
+	if err := p.UpdateProduct(s.DB); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -98,20 +98,9 @@ func (s *Server) DeleteProduct(w http.ResponseWriter, r *http.Request) {
 	}
 
 	p := data.Product{ID: id}
-	if err := p.deleteProduct(s.DB); err != nil {
+	if err := p.DeleteProduct(s.DB); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
 	respondWithJSON(w, http.StatusOK, map[string]string{"result": "success"})
-}
-
-func respondWithError(w http.ResponseWriter, code int, message string) {
-	respondWithJSON(w, code, map[string]string{"error": message})
-}
-
-func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
-	res, _ := json.Marshal(payload)
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(code)
-	w.Write(res)
 }
