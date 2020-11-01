@@ -89,7 +89,7 @@ func (s *Server) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusOK, p)
 }
 
-func (s *Server) deleteProduct(w http.ResponseWriter, r *http.Request) {
+func (s *Server) DeleteProduct(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
 	if err != nil {
