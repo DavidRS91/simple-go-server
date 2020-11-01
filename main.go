@@ -15,6 +15,6 @@ func main() {
 		os.Getenv("APP_DB_PORT"),
 		os.Getenv("APP_DB_SSLMODE"),
 	)
-	fmt.Println("app initialized")
+	fmt.Println("App initialized")
 	a.Run(":8010")
 }

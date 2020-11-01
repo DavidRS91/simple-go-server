@@ -19,7 +19,7 @@ func New(db *sql.DB, r *mux.Router) *Server {
 	return &s
 }
 
-func (s Server) InitializeRoutes() {
+func (s *Server) InitializeRoutes() {
 	s.Router.HandleFunc("/products", s.GetProducts).Methods("GET")
 	s.Router.HandleFunc("/product", s.CreateProduct).Methods("POST")
 	s.Router.HandleFunc("/product/{id:[0-9]+}", s.GetProduct).Methods("GET")

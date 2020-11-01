@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/DavidRS91/simple-go-server/service"
 	"github.com/golang-migrate/migrate/v4"
@@ -41,11 +42,23 @@ func (a *App) Initialize(user, password, dbname, host, port, sslmode string) {
 		dbname,
 		sslmode,
 	)
-	m, err := migrate.New("file://data/migrations", postgresURL)
+
+	var m *migrate.Migrate
+	retries := 0
+
+	for m == nil && retries < 5 {
+		m, err = migrate.New("file://data/migrations", postgresURL)
+		if err != nil {
+			fmt.Errorf("failed to connect to db, retrying... retries=%d", retries)
+		}
+		time.Sleep(time.Second)
+		retries++
+	}
 	if err != nil {
 		log.Fatal(err)
 	}
-	if err := m.Up(); err != nil {
+
+	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
 		log.Fatal(err)
 	}
 
@@ -55,11 +68,11 @@ func (a *App) Initialize(user, password, dbname, host, port, sslmode string) {
 }
 
 func (a *App) Run(addr string) {
+	fmt.Printf("Listening on %s", addr)
 	c := cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"},
 		AllowCredentials: true,
 	})
-	fmt.Printf("Listening on %s", addr)
 	handler := c.Handler(a.Router)
 	log.Fatal(http.ListenAndServe(addr, handler))
 }
