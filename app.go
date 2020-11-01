@@ -8,6 +8,9 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/golang-migrate/migrate/v4"
+	_ "github.com/golang-migrate/migrate/v4/database/postgres"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
 	"github.com/rs/cors"
@@ -18,7 +21,7 @@ type App struct {
 	DB     *sql.DB
 }
 
-var createTableQuery string = "CREATE TABLE IF NOT EXISTS products( id SERIAL, name TEXT NOT NULL, price NUMERIC(10,2) NOT NULL DEFAULT 0.00, CONSTRAINT products_pkey PRIMARY KEY (id));"
+// var createTableQuery string = "CREATE TABLE IF NOT EXISTS products( id SERIAL, name TEXT NOT NULL, price NUMERIC(10,2) NOT NULL DEFAULT 0.00, CONSTRAINT products_pkey PRIMARY KEY (id));"
 
 func (a *App) Initialize(user, password, dbname, host, port, sslmode string) {
 	fmt.Println("Initializing...")
@@ -31,11 +34,21 @@ func (a *App) Initialize(user, password, dbname, host, port, sslmode string) {
 	}
 
 	fmt.Println("Running migrations...")
-	_, err = a.DB.Exec(createTableQuery)
+	postgresURL := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=%s",
+		user,
+		password,
+		host,
+		port,
+		dbname,
+		sslmode,
+	)
+	m, err := migrate.New("file://data/migrations", postgresURL)
 	if err != nil {
 		log.Fatal(err)
 	}
-
+	if err := m.Up(); err != nil {
+		log.Fatal(err)
+	}
 	a.Router = mux.NewRouter()
 	a.initRoutes()
 }

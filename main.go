@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 )
 
@@ -14,5 +15,6 @@ func main() {
 		os.Getenv("APP_DB_PORT"),
 		os.Getenv("APP_DB_SSLMODE"),
 	)
+	fmt.Println("app initialized")
 	a.Run(":8010")
 }
